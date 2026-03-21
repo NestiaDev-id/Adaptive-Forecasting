@@ -49,10 +49,12 @@ export function ForecastChart({ result }: Props) {
           <Line
             type="monotone" dataKey="actual" stroke="#3b82f6"
             strokeWidth={2} dot={false} name="Aktual"
+            isAnimationActive={true} animationDuration={800}
           />
           <Line
             type="monotone" dataKey="predicted" stroke="#f97316"
             strokeWidth={2} strokeDasharray="6 3" dot={false} name="Prediksi"
+            isAnimationActive={true} animationDuration={800}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -76,14 +78,17 @@ export function ForecastChart({ result }: Props) {
           <Area
             type="monotone" dataKey="upper" stroke="none"
             fill="#f9731622" name="Batas Atas"
+            isAnimationActive={true} animationDuration={800}
           />
           <Area
             type="monotone" dataKey="lower" stroke="none"
             fill="#3b82f600" name="Batas Bawah"
+            isAnimationActive={true} animationDuration={800}
           />
           <Line
             type="monotone" dataKey="forecast" stroke="#f97316"
             strokeWidth={2.5} dot={{ r: 4, fill: "#f97316" }} name="Forecast"
+            isAnimationActive={true} animationDuration={800}
           />
         </AreaChart>
       </ResponsiveContainer>

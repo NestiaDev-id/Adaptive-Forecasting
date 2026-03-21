@@ -128,3 +128,70 @@
     @apply font-sans;
     }
 }
+
+/* ─── Custom Scrollbar ─── */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  :root {
+    --scrollbar-thumb: oklch(0.8 0 0);
+    --scrollbar-track: oklch(0.95 0 0);
+    --scrollbar-thumb-hover: oklch(0.65 0 0);
+  }
+
+  .dark {
+    --scrollbar-thumb: oklch(0.35 0 0);
+    --scrollbar-track: oklch(0.18 0 0);
+    --scrollbar-thumb-hover: oklch(0.5 0 0);
+  }
+
+  /* WebKit (Chrome, Edge, Safari) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ─── Custom Number Input Spin Buttons ─── */
+@layer base {
+  /* Hide default browser spinners */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+/* ─── Textarea no-resize ─── */
+@layer base {
+  textarea {
+    resize: none !important;
+  }
+}
