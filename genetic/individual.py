@@ -28,9 +28,8 @@ class Individual:
 
         # ── Model DNA (which models & their ensemble weights) ────────
         self.model_weights: dict[str, float] = {
-            "holt_winters": 0.5,
-            "arima": 0.3,
-            "lstm": 0.2,
+            "holt_winters": 0.6,
+            "arima": 0.4,
         }
 
         # ── Fitness ──────────────────────────────────────────────────
@@ -56,11 +55,10 @@ class Individual:
         ind.mutation_step = np.random.uniform(*MUTATION_STEP_BOUNDS)
 
         # Randomise model weights (normalised)
-        raw_w = np.random.dirichlet(np.ones(3))
+        raw_w = np.random.dirichlet(np.ones(2))
         ind.model_weights = {
             "holt_winters": float(raw_w[0]),
             "arima": float(raw_w[1]),
-            "lstm": float(raw_w[2]),
         }
 
         return ind

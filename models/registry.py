@@ -39,6 +39,18 @@ class ModelRegistry:
 # ── Default registry with built-in models ────────────────────────────────
 
 def build_default_registry() -> ModelRegistry:
+    """Default registry: HW + ARIMA (fast enough for GA evaluation)."""
+    from models.holt_winters import HoltWinters
+    from models.arima import ARIMA
+
+    registry = ModelRegistry()
+    registry.register("holt_winters", HoltWinters)
+    registry.register("arima", ARIMA)
+    return registry
+
+
+def build_full_registry() -> ModelRegistry:
+    """Full registry including LSTM (slower, use for final training only)."""
     from models.holt_winters import HoltWinters
     from models.arima import ARIMA
     from models.lstm import SimpleLSTM
