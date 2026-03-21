@@ -39,7 +39,7 @@ export function WeightsChart({ weights }: Props) {
               borderRadius: "8px",
               color: "hsl(var(--foreground))",
             }}
-            formatter={(value: number) => [`${value}%`, "Bobot"]}
+            formatter={(value) => [`${value as number}%`, "Bobot"]}
           />
           <Bar dataKey="weight" radius={[6, 6, 0, 0]}>
             {data.map((_, i) => (

@@ -339,30 +339,6 @@ Self-Adaptive GA:
 
 ---
 
-## 🚀 Deploy ke Vercel
-
-Repo ini dikonfigurasi untuk **hybrid deployment** ke Vercel: frontend React+Vite di `frontend/` dan backend FastAPI di `api/`.
-
-### Cara Deploy
-
-1. **Import repo** di [vercel.com/new](https://vercel.com/new).
-2. Di **Project Settings**, biarkan **Root Directory** kosong (tetap di root repo) — `vercel.json` sudah menangani konfigurasi build.
-3. Vercel akan otomatis mendeteksi `vercel.json` dan menggunakan:
-   - **Build Command**: `cd frontend && npm install && npm run build`
-   - **Output Directory**: `frontend/dist`
-4. Klik **Deploy**.
-
-### Cara Kerja Routing
-
-| Path | Dihandle oleh |
-|------|--------------|
-| `/api/*` | FastAPI serverless function (`api/main.py`) |
-| `/*` (selain `/api`) | Frontend SPA (`frontend/dist/index.html`) |
-
-> **Catatan lokal:** Saat development, proxy `/api` → `localhost:8000` di `frontend/vite.config.ts` tetap berjalan normal. `vercel.json` hanya aktif di environment Vercel.
-
----
-
 ## 📌 Roadmap
 
 - [x] Core engine (GA + Models + Adaptation)
