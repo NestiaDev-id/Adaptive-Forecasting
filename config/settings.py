@@ -77,3 +77,15 @@ LSTM_EPOCH_BOUNDS = (10, 200)
 RANDOM_SEED = 42
 DEFAULT_FORECAST_HORIZON = 12
 DEFAULT_VAL_RATIO = 0.2
+
+# ============================================================================
+# UPSTASH REDIS  –  Serverless State Management
+# ============================================================================
+# ============================================================================
+UPSTASH_REDIS_REST_URL = os.environ.get("UPSTASH_REDIS_REST_URL") or os.environ.get("KV_REST_API_URL", "")
+UPSTASH_REDIS_REST_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN") or os.environ.get("KV_REST_API_TOKEN", "")
+
+# ============================================================================
+# WORKER  –  Background Standalone Process
+# ============================================================================
+WORKER_INTERVAL_SECONDS = int(os.environ.get("WORKER_INTERVAL_SECONDS", "6"))

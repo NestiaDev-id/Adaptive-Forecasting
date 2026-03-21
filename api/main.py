@@ -12,6 +12,7 @@ from api.app.routes.training import router as training_router
 from api.app.routes.profile import router as profile_router
 from api.app.routes.stream import router as stream_router
 from api.app.routes.status import router as status_router
+from api.app.routes.public import router as public_router
 
 app = FastAPI(
     title="Adaptive Forecasting Engine API",
@@ -32,6 +33,7 @@ app.include_router(training_router)
 app.include_router(profile_router)
 app.include_router(stream_router)
 app.include_router(status_router)
+app.include_router(public_router)
 
 
 @app.get("/")
@@ -49,5 +51,7 @@ async def root():
             "POST /api/stream/reset",
             "GET  /api/status",
             "GET  /api/models",
+            "GET  /api/forecast/latest",
+            "GET  /api/forecast/history",
         ],
     }
