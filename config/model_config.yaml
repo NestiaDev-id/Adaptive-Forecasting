@@ -1,0 +1,62 @@
+models:
+  holt_winters:
+    params:
+      alpha: { min: 0.01, max: 0.99, type: float }
+      beta:  { min: 0.001, max: 0.50, type: float }
+      gamma: { min: 0.001, max: 0.99, type: float }
+      season_length: { min: 2, max: 52, type: int }
+    modes: ["additive", "multiplicative"]
+
+  arima:
+    params:
+      p: { min: 0, max: 5, type: int }
+      d: { min: 0, max: 2, type: int }
+      q: { min: 0, max: 5, type: int }
+
+  lstm:
+    params:
+      hidden_size: { min: 4, max: 64, type: int }
+      learning_rate: { min: 0.0001, max: 0.1, type: float }
+      epochs: { min: 10, max: 200, type: int }
+
+genetic_algorithm:
+  population_size: 60
+  max_generations: 200
+  tournament_size: 5
+  elitism_count: 3
+
+  strategy_dna:
+    mutation_rate: { min: 0.01, max: 0.50 }
+    crossover_rate: { min: 0.40, max: 0.95 }
+    mutation_step:  { min: 0.001, max: 0.20 }
+    self_adaptation_rate: 0.10    # tau
+    strategy_mutation_rate: 0.10
+
+  adaptive_fitness:
+    stagnation_limit: 15
+    switch_cooldown: 10
+    diversity_threshold: 0.05
+    overfitting_ratio: 1.5
+    metrics: ["mse", "mae", "rmse", "mape"]
+
+  memory:
+    failure_bank_size: 100
+    success_bank_size: 50
+    pattern_bank_size: 30
+
+drift_detection:
+  cusum:
+    threshold: 5.0
+    drift_rate: 0.5
+  min_window: 20
+  cooldown: 10
+
+reflex:
+  decay: 0.95
+  error_sensitivity: 1.0
+  min_weight: 0.01
+
+general:
+  random_seed: 42
+  default_forecast_horizon: 12
+  default_val_ratio: 0.2
