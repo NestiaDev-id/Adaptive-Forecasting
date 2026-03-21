@@ -15,6 +15,9 @@ eggs/
 lib/
 lib64/
 parts/
+
+# Do not ignore TypeScript source lib directories
+!frontend/src/lib/
 sdist/
 var/
 wheels/
