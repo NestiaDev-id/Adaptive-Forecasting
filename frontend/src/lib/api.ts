@@ -1,3 +1,5 @@
+import { BASE_URL } from "@/lib/baseUrl";
+
 export interface DriftEvent {
   method: string;
   magnitude: number;
@@ -61,8 +63,6 @@ interface ForecastRequest {
   population: number;
   val_ratio: number;
 }
-
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 export const api = {
   forecast: async (req: ForecastRequest): Promise<ForecastResponse> => {

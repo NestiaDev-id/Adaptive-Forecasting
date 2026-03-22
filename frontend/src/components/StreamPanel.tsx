@@ -9,7 +9,7 @@ import {
 import { Play, Square, RotateCcw, Zap, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+import { BASE_URL } from "@/lib/baseUrl";
 
 interface StreamPoint {
   index: number;
