@@ -10,7 +10,7 @@
  */
 
 export const BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+  (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ?? "";
 
 if (import.meta.env.PROD && !BASE_URL) {
   console.error(

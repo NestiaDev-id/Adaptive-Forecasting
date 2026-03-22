@@ -45,11 +45,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://adaptive-forecasting.vercel.app",
-        "http://localhost:5173", # Allow local dev
+        "http://localhost:5173",
     ],
+    allow_origin_regex=r"https://adaptive-forecasting-.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "X-API-Key"],
 )
 
 app.include_router(forecast_router, prefix="/api")
