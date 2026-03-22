@@ -68,7 +68,10 @@ export const api = {
   forecast: async (req: ForecastRequest): Promise<ForecastResponse> => {
     const res = await fetch(`${BASE_URL}/api/forecast`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": (import.meta.env.VITE_INTERNAL_API_KEY as string) || "",
+      },
       body: JSON.stringify(req),
     });
 

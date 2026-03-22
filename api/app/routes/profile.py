@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from api.app.schemas.profile import ProfileRequest, ProfileResponse
 from patterns.detector import detect
 
-router = APIRouter(prefix="/api", tags=["profile"])
+router = APIRouter(tags=["profile"])
 
 
 @router.post("/profile", response_model=ProfileResponse)

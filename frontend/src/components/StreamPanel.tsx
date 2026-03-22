@@ -44,7 +44,10 @@ export function StreamPanel({ sampleData }: Props) {
     try {
       const res = await fetch(`${BASE_URL}/api/stream/init`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": (import.meta.env.VITE_INTERNAL_API_KEY as string) || "",
+        },
         body: JSON.stringify({ data: initData }),
       });
       if (!res.ok) throw new Error("Init failed");
@@ -76,7 +79,10 @@ export function StreamPanel({ sampleData }: Props) {
     try {
       const res = await fetch(`${BASE_URL}/api/stream/step`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": (import.meta.env.VITE_INTERNAL_API_KEY as string) || "",
+        },
         body: JSON.stringify({ value }),
       });
       if (!res.ok) throw new Error("Step failed");
@@ -130,7 +136,12 @@ export function StreamPanel({ sampleData }: Props) {
     setStats({ drifts: 0, confidence: 0, steps: 0 });
     indexRef.current = 0;
     try {
-      await fetch(`${BASE_URL}/api/stream/reset`, { method: "POST" });
+      await fetch(`${BASE_URL}/api/stream/reset`, {
+        method: "POST",
+        headers: {
+          "X-API-Key": (import.meta.env.VITE_INTERNAL_API_KEY as string) || "",
+        },
+      });
     } catch { /* ignore */ }
   }, [stop]);
 

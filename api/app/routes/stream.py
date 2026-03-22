@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from api.app.schemas.stream import StreamInitRequest, StreamStepRequest, StreamResponse
 from api.app.__utils__ import get_online_loop, reset_online_loop, get_redis
 
-router = APIRouter(prefix="/api", tags=["stream"])
+router = APIRouter(tags=["stream"])
 
 # Redis key constants
 REDIS_STREAM_BUFFER = "stream:buffer"

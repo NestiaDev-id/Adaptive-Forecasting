@@ -6,7 +6,7 @@ from api.app.__utils__ import update_engine_state
 from pipeline.trainer import Trainer
 from evaluation.metrics import mse
 
-router = APIRouter(prefix="/api", tags=["training"])
+router = APIRouter(tags=["training"])
 
 
 @router.post("/train", response_model=TrainResponse)

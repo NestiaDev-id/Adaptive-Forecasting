@@ -89,3 +89,9 @@ UPSTASH_REDIS_REST_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN") or os.envi
 # WORKER  –  Background Standalone Process
 # ============================================================================
 WORKER_INTERVAL_SECONDS = int(os.environ.get("WORKER_INTERVAL_SECONDS", "6"))
+
+# ============================================================================
+# SECURITY  –  Internal API Key Protection
+# ============================================================================
+# Shared secret between Frontend and Backend (Vercel)
+INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "")

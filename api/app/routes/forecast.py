@@ -7,7 +7,7 @@ from api.app.schemas.forecast import (
 from api.app.__utils__ import update_engine_state
 from pipeline.orchestrator import Orchestrator
 
-router = APIRouter(prefix="/api", tags=["forecast"])
+router = APIRouter(tags=["forecast"])
 
 
 @router.post("/forecast", response_model=ForecastResponse)

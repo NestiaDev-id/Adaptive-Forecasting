@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 
 from api.app.__utils__ import get_redis, get_engine_state
 
-router = APIRouter(prefix="/api", tags=["public"])
+router = APIRouter(tags=["public"])
 
 # Redis keys used by the worker
 REDIS_LATEST_FORECAST = "public:latest_forecast"

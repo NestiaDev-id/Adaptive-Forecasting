@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from api.app.__utils__ import get_engine_state
 from models.registry import build_default_registry, build_full_registry
 
-router = APIRouter(prefix="/api", tags=["status"])
+router = APIRouter(tags=["status"])
 
 
 @router.get("/status")
