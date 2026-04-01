@@ -21,6 +21,13 @@ import {
   EVENT_STYLES,
   type EONETEvent,
 } from "@/services/nasa";
+import {
+  fetchBMKGQuakes,
+  filterQuakesByRadius,
+  quakeMarkerColor,
+  quakeLabel,
+  type BMKGQuake,
+} from "@/services/bmkgQuakes";
 
 // Fix Leaflet default marker icons in bundlers
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -80,8 +87,10 @@ export default function PublicDashboard() {
   const [weather, setWeather] = useState<BMKGForecast[] | null>(null);
   const [stationLabel, setStationLabel] = useState("");
   const [events, setEvents] = useState<EONETEvent[]>([]);
+  const [quakes, setQuakes] = useState<BMKGQuake[]>([]);
   const [loadingWeather, setLoadingWeather] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [loadingQuakes, setLoadingQuakes] = useState(true);
   const [flyToTarget, setFlyToTarget] = useState<FlyTarget | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const markerRefs = useRef<Record<string, L.Marker>>({});
@@ -111,6 +120,21 @@ export default function PublicDashboard() {
         }
       })
       .finally(() => setLoadingEvents(false));
+  }, [geo.lat, geo.lon]);
+
+  // Fetch BMKG earthquakes
+  useEffect(() => {
+    setLoadingQuakes(true);
+    fetchBMKGQuakes()
+      .then((all) => {
+        if (geo.lat && geo.lon) {
+          setQuakes(filterQuakesByRadius(all, geo.lat, geo.lon, 1500));
+        } else {
+          // Default: show all Indonesian quakes
+          setQuakes(all.slice(0, 100));
+        }
+      })
+      .finally(() => setLoadingQuakes(false));
   }, [geo.lat, geo.lon]);
 
   const currentWeather = weather?.[0];
@@ -150,6 +174,9 @@ export default function PublicDashboard() {
             <Badge variant="secondary" className="text-xs gap-1">
               <AlertTriangle className="h-3 w-3" />
               {events.length} Events
+            </Badge>
+            <Badge variant="secondary" className="text-xs gap-1 bg-red-500/10 text-red-400 border-red-500/30">
+              🔴 {quakes.length} Gempa
             </Badge>
           </div>
         </div>
@@ -233,6 +260,43 @@ export default function PublicDashboard() {
                       <br />
                       <span className="text-gray-400 font-mono">
                         📍 {lat.toFixed(4)}, {lon.toFixed(4)}
+                      </span>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
+
+            {/* BMKG Earthquake markers */}
+            {quakes.map((quake) => {
+              if (quake.latitude === null || quake.longitude === null) return null;
+              const color = quakeMarkerColor(quake.magnitude);
+              return (
+                <Marker
+                  key={quake.eventid}
+                  position={[quake.latitude, quake.longitude]}
+                  icon={createEventIcon(color)}
+                  ref={(ref) => { if (ref) markerRefs.current[quake.eventid] = ref; }}
+                  eventHandlers={{
+                    click: () => setSelectedEventId(quake.eventid),
+                  }}
+                >
+                  <Popup>
+                    <div className="text-xs space-y-1">
+                      <strong>🔴 Gempa M{quake.magnitude?.toFixed(1)}</strong>
+                      <br />
+                      <span className="text-gray-500">{quake.area}</span>
+                      <br />
+                      <span className="text-gray-400">
+                        Kedalaman: {quake.depth_km} km
+                      </span>
+                      <br />
+                      <span className="text-gray-400 text-[10px]">
+                        {quake.datetime}
+                      </span>
+                      <br />
+                      <span className="text-gray-400 font-mono text-[10px]">
+                        📍 {quake.latitude.toFixed(4)}, {quake.longitude.toFixed(4)}
                       </span>
                     </div>
                   </Popup>
@@ -369,17 +433,72 @@ export default function PublicDashboard() {
               </Card>
             )}
 
-            {/* Events List */}
+            {/* BMKG Earthquakes List */}
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                    🔴 Gempa Bumi BMKG
+                  </h3>
+                  {loadingQuakes && <Spinner className="h-3 w-3" />}
+                </div>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {quakes.length > 0 ? quakes.slice(0, 30).map((quake, i) => (
+                    <motion.div
+                      key={quake.eventid}
+                      className={`flex items-start gap-2 py-1.5 px-2 rounded text-xs transition-colors cursor-pointer ${
+                        selectedEventId === quake.eventid
+                          ? "bg-red-500/10 ring-1 ring-red-500/30"
+                          : "hover:bg-secondary/30"
+                      }`}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + i * 0.03 }}
+                      onClick={() => {
+                        if (quake.latitude === null || quake.longitude === null) return;
+                        setSelectedEventId(quake.eventid);
+                        setFlyToTarget({ lat: quake.latitude, lon: quake.longitude, zoom: 10, eventId: quake.eventid });
+                        setTimeout(() => {
+                          markerRefs.current[quake.eventid]?.openPopup();
+                        }, 1300);
+                      }}
+                      whileHover={{ x: 2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span
+                        className="h-2 w-2 rounded-full mt-1 shrink-0"
+                        style={{ background: quakeMarkerColor(quake.magnitude) }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-foreground truncate font-medium">
+                          M{quake.magnitude?.toFixed(1)} — {quake.area}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {quakeLabel(quake.magnitude)} · {quake.depth_km} km · {quake.datetime?.split("  ")[0]}
+                        </p>
+                      </div>
+                      <MapPin className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                    </motion.div>
+                  )) : !loadingQuakes ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      Tidak ada data gempa.
+                    </p>
+                  ) : null}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* NASA EONET Events List */}
             <Card className="bg-card/50 border-border/50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
                     <AlertTriangle className="h-3.5 w-3.5 text-yellow-400" />
-                    Event Aktif
+                    Event Aktif (NASA)
                   </h3>
                   {loadingEvents && <Spinner className="h-3 w-3" />}
                 </div>
-                <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
                   {events.length > 0  ? events.map((event, i) => {
                     const category = categorizeEvent(event.categories);
                     const style = EVENT_STYLES[category];
@@ -400,7 +519,6 @@ export default function PublicDashboard() {
                           const [eLon, eLat] = g.coordinates;
                           setSelectedEventId(event.id);
                           setFlyToTarget({ lat: eLat, lon: eLon, zoom: 10, eventId: event.id });
-                          // Open the marker popup after fly completes
                           setTimeout(() => {
                             markerRefs.current[event.id]?.openPopup();
                           }, 1300);
