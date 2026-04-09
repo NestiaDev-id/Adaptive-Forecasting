@@ -40,6 +40,7 @@ export default function SandboxPage() {
   const [horizon, setHorizon] = useState(12);
   const [generations, setGenerations] = useState(30);
   const [population, setPopulation] = useState(20);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const parseData = useCallback((): number[] => {
     return dataInput
@@ -96,9 +97,26 @@ export default function SandboxPage() {
     toast.info("Sample data dimuat (120 data point seasonal)");
   };
 
-  const handleFileLoaded = (data: number[], _fileName: string) => {
-    setDataInput(data.join(", "));
+  const handleFileLoaded = (data: number[], fileName: string) => {
+    setFileName(fileName);
+    setResult(null); // Clear previous results when new file is loaded
+
+    // Only sync to textarea if data is small enough to avoid lag
+    if (data.length > 0 && data.length < 50000) {
+      setDataInput(data.join(", "));
+    } else if (data.length === 0) {
+      setDataInput(`[Data dari Cloud: ${fileName}]`);
+    } else {
+      setDataInput(`[File besar dimuat: ${data.length.toLocaleString()} poin]`);
+    }
+    
     setParsedData(data);
+  };
+
+  const clearFile = () => {
+    setFileName(null);
+    setDataInput("");
+    setParsedData([]);
   };
 
   return (
@@ -147,14 +165,28 @@ export default function SandboxPage() {
                   </motion.div>
                 </div>
 
-                <FileUpload onDataLoaded={handleFileLoaded} />
+                <FileUpload onDataLoaded={handleFileLoaded} onClear={clearFile} />
 
-                <Textarea
-                  value={dataInput}
-                  onChange={(e) => setDataInput(e.target.value)}
-                  placeholder="Masukkan data time series... (pisahkan dengan koma)"
-                  className="h-28 text-xs font-mono resize-none bg-secondary/30"
-                />
+                <div className="relative group">
+                  <Textarea
+                    value={dataInput}
+                    onChange={(e) => setDataInput(e.target.value)}
+                    disabled={!!fileName || loading}
+                    placeholder="Masukkan data time series... (pisahkan dengan koma)"
+                    className={`h-28 text-xs font-mono resize-none transition-all ${
+                      fileName 
+                        ? "bg-secondary/10 text-muted-foreground/50 border-dashed opacity-60" 
+                        : "bg-secondary/30"
+                    }`}
+                  />
+                  {fileName && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/20 backdrop-blur-[1px] rounded-md pointer-events-none">
+                      <Badge variant="secondary" className="text-[10px] animate-in fade-in zoom-in duration-300">
+                        Mode File Aktif
+                      </Badge>
+                    </div>
+                  )}
+                </div>
 
                 <Separator />
 

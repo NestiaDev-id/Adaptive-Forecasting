@@ -1,15 +1,17 @@
 import { useCallback, useRef, useState } from "react";
-import { Upload, FileSpreadsheet, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "motion/react";
+import { Button } from "@/components/ui/button";
+import { X, FileSpreadsheet, Upload } from "lucide-react";
 import { parseCSVStream, type ParseProgress, type ParseResult } from "@/lib/csv-parser";
+import { initCloudUpload, performResumableUpload } from "@/services/cloudUpload";
 import { toast } from "sonner";
 
 interface Props {
   onDataLoaded: (data: number[], fileName: string) => void;
+  onClear?: () => void;
 }
 
-export function FileUpload({ onDataLoaded }: Props) {
+export function FileUpload({ onDataLoaded, onClear }: Props) {
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState<ParseProgress | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -23,6 +25,37 @@ export function FileUpload({ onDataLoaded }: Props) {
       }
 
       setFileName(file.name);
+      console.log(`[FileUpload] Processing: ${file.name} (${file.size} bytes)`);
+
+      // --- STRATEGY: Cloud vs Local ---
+      const CLOUD_THRESHOLD = 20 * 1024 * 1024; // 20 MB
+      const isLarge = file.size > CLOUD_THRESHOLD;
+      
+      console.log(`[FileUpload] Cloud Mode: ${isLarge ? "YES" : "NO"} (Threshold: 20MB)`);
+
+
+      if (isLarge) {
+        toast.info("File besar terdeteksi. Menggunakan Cloud Upload untuk efisiensi...", { icon: "☁️" });
+        const resumableUrl = await initCloudUpload(file);
+        if (resumableUrl) {
+          setProgress({ bytesRead: 0, totalBytes: file.size, rowsParsed: 0, percent: 0 });
+          const success = await performResumableUpload(resumableUrl, file, (p: number) => {
+            setProgress((prev: ParseProgress | null) => prev ? { ...prev, percent: p, bytesRead: (p / 100) * file.size } : null);
+          });
+
+          if (success) {
+            console.log("[FileUpload] Cloud upload finished successfully.");
+            toast.success("Upload ke Cloud Berhasil!", { description: "Data siap diproses oleh backend." });
+            onDataLoaded([], file.name); 
+          }
+          setProgress(null);
+          return;
+        } else {
+          console.warn("[FileUpload] Cloud init failed, falling back to local processing.");
+        }
+      }
+
+      console.log("[FileUpload] Starting local browser-based CSV parsing...");
       setProgress({ bytesRead: 0, totalBytes: file.size, rowsParsed: 0, percent: 0 });
 
       try {
@@ -77,6 +110,7 @@ export function FileUpload({ onDataLoaded }: Props) {
   const clearFile = () => {
     setFileName(null);
     setProgress(null);
+    onClear?.();
   };
 
   return (
@@ -89,7 +123,7 @@ export function FileUpload({ onDataLoaded }: Props) {
             : "border-border/50 hover:border-border"
           }
         `}
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragOver={(e: React.DragEvent) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
