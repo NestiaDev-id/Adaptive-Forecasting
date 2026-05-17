@@ -244,11 +244,29 @@ adaptive_forecasting/
 
 ## 🚀 Quick Start
 
-### Backend (Forecasting Engine)
+### 🖥️ Local Execution
 
+Untuk menjalankan seluruh sistem, Anda perlu menjalankan **dua terminal** secara bersamaan:
+
+#### Terminal 1: Backend (Uvicorn)
 ```bash
-# Install dependencies
-pip install numpy matplotlib pyyaml
+# Pastikan virtual environment aktif jika ada
+python3 -m uvicorn api.main:app --port 8000 --reload
+```
+
+#### Terminal 2: Frontend (React + Vite)
+```bash
+cd frontend
+npm install  # Jika baru pertama kali
+npm run dev
+```
+
+---
+
+### 📦 Setup Dependencies
+```bash
+# Backend
+pip install -r requirements.txt
 
 # Demo dengan data seasonal
 python3 main.py --demo seasonal
