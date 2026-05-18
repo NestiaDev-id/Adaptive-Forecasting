@@ -21,6 +21,7 @@ forecaster = ChronosDisasterForecaster()
 class ForecastRequest(BaseModel):
     limit: int = 50
     horizon: int = 10
+    zone: str | None = None
 
 @app.get("/")
 def read_root():
@@ -31,9 +32,19 @@ def read_root():
         "ready": forecaster.model_loaded
     }
 
+@app.get("/zones")
+def list_zones():
+    """Returns all available seismic zones with event counts."""
+    return forecaster.get_available_zones()
+
 @app.post("/analyze/earthquake")
 def analyze_earthquake(req: ForecastRequest):
-    result = forecaster.forecast_earthquakes(limit=req.limit, horizon=req.horizon)
+    """Run Chronos forecast on earthquake magnitude trends, optionally filtered by zone."""
+    result = forecaster.forecast_earthquakes(
+        limit=req.limit, 
+        horizon=req.horizon, 
+        zone=req.zone
+    )
     return result
 
 if __name__ == "__main__":
