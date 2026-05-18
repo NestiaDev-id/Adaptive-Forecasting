@@ -16,6 +16,12 @@ const NAV_ITEMS = [
     label: "Research Sandbox",
     description: "Upload & prediksi",
   },
+  {
+    to: "/research",
+    icon: FlaskConical,
+    label: "Disaster AI Lab",
+    description: "Chronos-2 forecast",
+  },
 ];
 
 export function Sidebar() {

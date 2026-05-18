@@ -7,6 +7,7 @@ import './index.css'
 import App from './App.tsx'
 import PublicDashboard from './pages/PublicDashboard.tsx'
 import SandboxPage from './pages/SandboxPage.tsx'
+import ResearchLab from './pages/ResearchLab.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
           <Route element={<App />}>
             <Route index element={<PublicDashboard />} />
             <Route path="sandbox" element={<SandboxPage />} />
+            <Route path="research" element={<ResearchLab />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+chronos-forecasting
+torch
+numpy
+scipy
+pydantic
